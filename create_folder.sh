@@ -1,15 +1,34 @@
 #!/bin/bash
 
+# Colors for styling
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+RESET='\033[0m'
+
+# Function to display colored text
+
+print_color() {
+    local color=$1
+    shift
+    echo -e "${color}$@${RESET}"
+}
+
+echo "--------------------------------------------------------------"
+
 # Prompt user for folder name
-read -p "Enter folder name: " folder_name
+print_color $YELLOW "Enter folder name: "
+read folder_name
+echo 
 
 # List folders on the Desktop and extract only folder names
-echo "Folders on Desktop:"
+print_color $GREEN "Folders on Desktop:"
 desktop_folders=$(ls -d ~/Desktop/*/ | xargs -n 1 basename)
 echo "$desktop_folders"
 
 # Prompt user to select a folder
-read -p "Enter the folder you want to go in: " selected_folder_basename
+print_color $YELLOW "Which directory would you like to create folder in? "
+read selected_folder_basename
 
 # Check if the selected folder basename exists
 selected_folder_fullpath=""
@@ -22,7 +41,7 @@ done
 
 # Check if the selected folder was found
 if [ -z "$selected_folder_fullpath" ]; then
-    echo "Error: Selected folder does not exist."
+    print_color $RED "Error: Selected directory does not exist."
     exit 1
 fi
 
@@ -32,5 +51,11 @@ mkdir -p "$selected_folder_fullpath/$folder_name"
 # Change directory to the newly created folder
 cd "$selected_folder_fullpath/$folder_name" || exit
 
+echo
 # Open the folder in VSCode
-code .
+print_color $YELLOW "Do you want to open this folder in VSCode? (y/n): "
+read open_in_vscode
+
+if [ "$open_in_vscode" = "y" ]; then
+    code .
+fi
